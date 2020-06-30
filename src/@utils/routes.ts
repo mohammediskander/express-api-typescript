@@ -4,7 +4,11 @@ import Validation, { ValidationsInterface } from "../@utils/validation";
 
 export interface RouteInterface {
   path: string;
-  function: Function;
+  function: (
+    request: Express.Request,
+    response: Response,
+    next?: NextFunction
+  ) => void;
   description?: string;
   enabled: boolean;
   roles?: object[];
@@ -28,7 +32,6 @@ declare global {
 
 class Routes {
   private routes: RouteInterface[];
-  // private server: ServerInterface[];
   private server: Application;
 
   constructor(server: Application, routes: RouteInterface[]) {
