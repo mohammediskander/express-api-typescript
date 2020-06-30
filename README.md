@@ -6,4 +6,4 @@
     - [ ] Validation Middleware
     - [ ] Authentication Middleware
     - [ ] Authorization Middleware
-    - [ ] Error Middleware
+    - [x] Error Middleware
