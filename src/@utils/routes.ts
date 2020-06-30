@@ -66,21 +66,20 @@ class Routes {
             next();
           },
           (request: Request, response: Response, next: NextFunction) => {
-            // const validation = new Validation(route.validation, request.body);
-
-            // try {
-            //   validation.validateAll();
-            //   next();
-            // } catch (error) {
-            //   const translate = new Translation("ar");
-            //   response
-            //     .status(error.status)
-            //     .send(
-            //       `${translate.getMessage(error.key)} ${translate.getMessage(
-            //         error.message
-            //       )}`
-            //     );
-            // }
+            const validation = new Validation(route.validation, request.body);
+            try {
+              validation.validateAll();
+              next();
+            } catch (error) {
+              const translate = new Translation("ar");
+              response
+                .status(error.status)
+                .send(
+                  `${translate.getMessage(error.key)} ${translate.getMessage(
+                    error.message
+                  )}`
+                );
+            }
             next();
           },
           (

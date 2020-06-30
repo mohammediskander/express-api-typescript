@@ -1,9 +1,22 @@
 ### TODO
 
+- [ ] Middlewares
+  - [ ] Morgan
+  - [ ] Helmet
+  - [x] Cors
+  - [x] BodyParser
+  - [ ] Passport
 - [ ] Setup Routes
-  - [ ] Setup Middlewares
-    - [ ] Log Middleware
-    - [ ] Validation Middleware
-    - [ ] Authentication Middleware
-    - [ ] Authorization Middleware
-    - [x] Error Middleware
+  - [ ] Route Middlewares
+    - [ ] Log
+    - [ ] Validation
+    - [ ] Authentication
+    - [ ] Authorization
+    - [x] Error
+  - [ ] Function
+    - [ ] System Initialization
+    - [ ] Error Handler
+- [ ] Utils
+  - [x] Translation
+  - [ ] Validation
+  - [x] Routes
