@@ -23,7 +23,7 @@
 
 ### Structure
 
-dist - Typescript output
+<!-- dist - Typescript output
 src
 |-- @utils - utilites
 | |-- routes.ts - router utility, a Class to configure routers based on array of objects.
@@ -36,4 +36,18 @@ src
 |-- config
 | |-- index.ts - combine of all configurations
 | |-- keys.ts - keys that should be hidden here from outsiders, this should be moved to .env at production.
-index.ts - express app creation.
+index.ts - express app creation. -->
+
+├───dist
+│ └───src
+│ ├───@utils
+│ ├───app
+│ │ ├───locales
+│ │ └───routes
+│ └───config
+└───src
+├───@utils
+├───app
+│ ├───locales
+│ └───routes
+└───config
