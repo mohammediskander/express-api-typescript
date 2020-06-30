@@ -36,6 +36,6 @@ src
 ├─config
 │ ├─index.ts - combine of all configurations
 │ └─keys.ts - keys that should be hidden here from outsiders, this should be moved to .env at production.
-└─index.ts - express app configuration
+├─index.ts - express app configuration
 index.ts - express app creation.
 ```
