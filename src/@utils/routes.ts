@@ -1,14 +1,10 @@
-import { Application, Request, Response, NextFunction } from "express";
-import Translation from "../@utils/translation";
-import Validation, { ValidationsInterface } from "../@utils/validation";
+import { Application, RequestHandler, Router } from "express";
+import { ValidationsInterface } from "../@utils/validation";
+import passport from "passport";
 
 export interface RouteInterface {
   path: string;
-  function: (
-    request: Express.Request,
-    response: Response,
-    next?: NextFunction
-  ) => void;
+  function: RequestHandler;
   description?: string;
   enabled: boolean;
   roles?: object[];
@@ -32,78 +28,35 @@ declare global {
 
 class Routes {
   private routes: RouteInterface[];
-  private server: Application;
+  private router: Router = Router();
 
-  constructor(server: Application, routes: RouteInterface[]) {
+  constructor(routes: RouteInterface[]) {
     this.setRoutes(routes);
-    this.setServer(server);
   }
-
-  // SETTERS
-
-  private setServer = (server: Application) => {
-    this.server = server;
-  };
 
   private setRoutes = (routes: RouteInterface[]) => {
     this.routes = routes;
     return this;
   };
 
-  // GETTERS
-  private getServer = (): Application => {
-    return this.server;
-  };
-
   private getRoutes = (): RouteInterface[] => {
     return this.routes;
   };
 
-  public configureRoutes = (): void => {
+  public configureRoutes = (): Router => {
     this.getRoutes().forEach((route: RouteInterface) => {
       if (route.enabled) {
-        this.getServer()[route.method](
-          route.path,
-          (request: Request, response: Response, next: NextFunction) => {
-            console.log(`URL: ${request.url}`);
-            next();
-          },
-          (request: Request, response: Response, next: NextFunction) => {
-            const validation = new Validation(route.validation, request.body);
-            try {
-              validation.validateAll();
-              next();
-            } catch (error) {
-              const translate = new Translation("ar");
-              response
-                .status(error.status)
-                .send(
-                  `${translate.getMessage(error.key)} ${translate.getMessage(
-                    error.message
-                  )}`
-                );
-            }
-            next();
-          },
-          (
-            request: Express.Request,
-            response: Response,
-            next: NextFunction
-          ) => {
-            route.function(request, response, next);
-          },
-          (
-            request: Request<any, any, any>,
-            response: Response,
-            next: NextFunction
-          ) => {
-            response
-              .status(request.error.status)
-              .send(new Translation("ar").getMessage(request.error.message));
-          }
-        );
+        if (route.access === "private")
+          this.router[route.method](
+            route.path,
+            passport.authenticate("jwt", { session: false }),
+            route.function
+          );
+        else this.router[route.method](route.path, route.function);
       }
     });
+
+    return this.router;
   };
 }
 

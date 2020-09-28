@@ -3,15 +3,15 @@ import Cors from "cors";
 import { initialize } from "passport";
 import Routes from "./@utils/routes";
 import routes from "./app/routes";
-import * as bodyParser from "body-parser";
+import bodyParser from "body-parser";
+import helmet from "helmet";
+import morgan from "morgan";
+import mongoose from "mongoose";
+import Translation from "./@utils/translation";
 
 export const configureServer = (app: any) => {
   app.use(Express.json({ limit: "5mb" }));
-  app.use(
-    Cors({
-      origin: "http://localhost:3000",
-    })
-  );
+  app.use(Cors());
   app.use(
     bodyParser.urlencoded({
       extended: false,
@@ -19,8 +19,57 @@ export const configureServer = (app: any) => {
     })
   );
   app.use(bodyParser.json());
-
   app.use(initialize());
+  app.use(morgan("common"));
+  app.use(helmet());
 
-  new Routes(app, routes).configureRoutes();
+  mongoose
+    .connect("mongodb://localhost/alexpos", {
+      useNewUrlParser: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
+      useUnifiedTopology: true,
+    })
+    .then(() => {
+      console.log(`MongoDB Connected Successfully!`);
+    })
+    .catch((error: any) => {
+      console.log(error.message);
+    });
+
+  app.use("/api/v1", new Routes(routes).configureRoutes());
+  app.use(
+    (
+      request: Express.Request,
+      response: Express.Response,
+      next: Express.NextFunction
+    ) => {
+      const error = new Error(`notFound`);
+      response.status(404);
+      next(error);
+    }
+  );
+  app.use(
+    (
+      error: any,
+      request: Express.Request,
+      response: Express.Response,
+      next: Express.NextFunction
+    ) => {
+      const statusCode =
+        response.statusCode === 200 ? 500 : response.statusCode;
+      response.status(statusCode);
+      response.json({
+        message: new Translation(
+          request.headers["accept-language"]
+            ? request.headers["accept-language"].match(/^([a-z]{2})\b/)[0] ||
+              undefined
+            : undefined
+        ).getMessage(error.message),
+        name: error.message,
+        statusCode: response.statusCode,
+        stack: process.env.NODE_ENV === "production" ? "🥞" : error.stack,
+      });
+    }
+  );
 };
